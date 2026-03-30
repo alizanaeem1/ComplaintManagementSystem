@@ -1,0 +1,3 @@
+[functions.admin-create-user]
+verify_jwt = false
+

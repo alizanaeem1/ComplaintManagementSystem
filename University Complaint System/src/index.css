@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  min-height: 100dvh;
+  background-color: #030712;
+}
+
+body {
+  font-family: 'Public Sans', system-ui, sans-serif;
+  min-height: 100dvh;
+  margin: 0;
+  background-color: #030712;
+}
+
+#root {
+  min-height: 100dvh;
+  background-color: #030712;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[role='button'] {
+  transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease,
+    box-shadow 0.22s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* SaaS micro-interactions — pair with Tailwind where needed */
+@layer components {
+  .btn-saas {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200;
+  }
+  .btn-saas-primary {
+    @apply btn-saas bg-primary text-white px-4 py-2.5 text-sm shadow-md shadow-primary/20;
+  }
+  .btn-saas-primary:hover:not(:disabled) {
+    @apply bg-primary/90 -translate-y-0.5 shadow-lg shadow-primary/25;
+  }
+  .btn-saas-primary:active:not(:disabled) {
+    @apply translate-y-0 scale-[0.98];
+  }
+  .btn-saas-ghost {
+    @apply btn-saas px-3 py-2 text-sm text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 border border-transparent;
+  }
+  .btn-saas-ghost:hover:not(:disabled) {
+    @apply -translate-y-0.5 bg-slate-200/90 dark:bg-slate-700 border-slate-200 dark:border-slate-600 shadow-sm;
+  }
+  .select-saas {
+    @apply appearance-none rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm
+      shadow-sm transition-all duration-200 ease-out
+      hover:border-primary/40 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role='button'],
+  .btn-saas-primary:hover:not(:disabled),
+  .btn-saas-ghost:hover:not(:disabled) {
+    transform: none !important;
+  }
+}
+
+/* Login: animated gradient shimmer on full “Welcome back” / “Admin Access” (reduced motion below) */
+@keyframes login-welcome-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.login-welcome-shimmer {
+  background: linear-gradient(
+    105deg,
+    #6d28d9 0%,
+    #a78bfa 15%,
+    #ddd6fe 32%,
+    #ffffff 48%,
+    #c4b5fd 62%,
+    #7c3aed 78%,
+    #4c1d95 100%
+  );
+  background-size: 280% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: login-welcome-shimmer 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-welcome-shimmer {
+    animation: none;
+    background-position: 40% 50%;
+  }
+}
+
+/* —— Admin dashboard: production dark shell (scoped under .admin-app) —— */
+@layer components {
+  .admin-app {
+    @apply bg-admin-bg text-slate-100 antialiased;
+  }
+
+  .admin-panel {
+    @apply rounded-2xl border border-slate-700/50 bg-admin-card text-slate-100 shadow-admin-card transition-all duration-300 ease-out;
+  }
+
+  .admin-panel:hover {
+    @apply border-slate-600/50 shadow-admin-card-hover;
+  }
+
+  .admin-panel-static {
+    @apply rounded-2xl border border-slate-700/50 bg-admin-card text-slate-100 shadow-admin-card;
+  }
+
+  .admin-inset {
+    @apply border-slate-700/60 bg-[#0c1424];
+  }
+
+  .admin-input {
+    @apply w-full rounded-xl border border-slate-600/70 bg-[#0f172a] px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 transition-colors duration-200;
+    @apply focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/20;
+  }
+
+  /*
+   * Chrome/Edge/Safari autofill paints email/password fields white/yellow and overrides our dark bg.
+   * Inset box-shadow “fills” the field so it stays on-theme; long transition delays autofill repaint.
+   */
+  .admin-input:-webkit-autofill,
+  .admin-input:-webkit-autofill:hover,
+  .admin-input:-webkit-autofill:focus,
+  .admin-input:-webkit-autofill:active {
+    -webkit-text-fill-color: #e2e8f0 !important;
+    caret-color: #e2e8f0;
+    box-shadow: 0 0 0 1000px #0f172a inset !important;
+    -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+    border-color: rgb(71 85 105 / 0.7) !important;
+    transition: background-color 99999s ease-out 0s;
+  }
+
+  .admin-select {
+    @apply admin-input appearance-none py-2.5;
+  }
+
+  .admin-table-head {
+    @apply border-b border-slate-700/80 bg-[#0c1424] text-left text-xs font-bold uppercase tracking-wider text-slate-400;
+  }
+
+  .admin-table-row {
+    @apply border-b border-slate-800/80 transition-colors duration-200;
+  }
+
+  .admin-table-row:hover {
+    @apply bg-sky-500/[0.06];
+  }
+
+  .admin-link-accent {
+    @apply bg-gradient-to-r from-sky-400 to-violet-400 bg-clip-text font-semibold text-transparent transition-opacity hover:opacity-90;
+  }
+
+  .admin-gradient-btn {
+    @apply rounded-xl bg-gradient-to-r from-sky-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition-all duration-200;
+    @apply hover:from-sky-500 hover:to-violet-500 hover:shadow-indigo-900/50 active:scale-[0.98];
+  }
+
+  /* Student & Faculty — same shell as admin (unified console) */
+  .portal-app {
+    @apply bg-admin-bg text-slate-100 antialiased;
+  }
+
+  .portal-bottom-nav {
+    @apply border-t border-slate-800/90 bg-admin-sidebar shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.5)];
+  }
+
+  /* Unified headings across Admin/Student/Staff portals */
+  .portal-app h2,
+  .admin-app h2 {
+    @apply font-extrabold tracking-tight;
+    color: #f8fafc;
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.18);
+  }
+
+  .portal-app h3,
+  .admin-app h3 {
+    @apply font-bold tracking-tight;
+    color: #e2e8f0;
+  }
+
+  .portal-app h2 .material-symbols-outlined,
+  .admin-app h2 .material-symbols-outlined,
+  .portal-app h3 .material-symbols-outlined,
+  .admin-app h3 .material-symbols-outlined {
+    color: #93c5fd;
+  }
+
+  .portal-app h2.bg-gradient-to-r,
+  .admin-app h2.bg-gradient-to-r,
+  .portal-app h3.bg-gradient-to-r,
+  .admin-app h3.bg-gradient-to-r {
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.24);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Consistent dark-themed scrollbar (avoid default white scrollbar) */
+  .student-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(167, 139, 250, 0.85) rgba(15, 23, 42, 0.25);
+  }
+  .student-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .student-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.25);
+    border-radius: 9999px;
+  }
+  .student-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(167, 139, 250, 0.8);
+    border-radius: 9999px;
+    border: 2px solid rgba(15, 23, 42, 0.25);
+  }
+  .student-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(99, 102, 241, 0.9);
+  }
+
+  /* Project-wide default scrollbar styling (fix "white scrollbar/line" in scroll areas). */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(167, 139, 250, 0.85) rgba(15, 23, 42, 0.25);
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.25);
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(167, 139, 250, 0.8);
+    border-radius: 9999px;
+    border: 2px solid rgba(15, 23, 42, 0.25);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(99, 102, 241, 0.9);
+  }
+  .table-striped tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  .table-striped tbody tr:nth-child(odd) {
+    background-color: transparent;
+  }
+}
