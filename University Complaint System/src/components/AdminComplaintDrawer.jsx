@@ -97,7 +97,17 @@ export function AdminComplaintDrawer({
 
   useEffect(() => {
     setSelectedDepartment(detail?.assigned_department || '')
-    setDeadlineDate(toDateInputValue(detail?.due_at))
+    const existingDue = toDateInputValue(detail?.due_at)
+    if (existingDue) {
+      setDeadlineDate(existingDue)
+    } else {
+      // Default to today if no deadline is set
+      const today = new Date()
+      const yyyy = today.getFullYear()
+      const mm = String(today.getMonth() + 1).padStart(2, '0')
+      const dd = String(today.getDate()).padStart(2, '0')
+      setDeadlineDate(`${yyyy}-${mm}-${dd}`)
+    }
   }, [detail?.id, detail?.assigned_department, detail?.due_at])
 
   return (

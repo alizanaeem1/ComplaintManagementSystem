@@ -112,7 +112,8 @@ function SubmitComplaint({ onSuccess }) {
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
-  const [files, setFiles] = useState([])
+  const [pictureUrl, setPictureUrl] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -146,7 +147,8 @@ function SubmitComplaint({ onSuccess }) {
           title: title.trim(),
           category,
           description: description.trim(),
-          files: files,
+          pictureUrl,
+          videoUrl,
           isAnonymous
         })
       )
@@ -157,7 +159,8 @@ function SubmitComplaint({ onSuccess }) {
       setTitle('')
       setCategory('')
       setDescription('')
-      setFiles([])
+      setPictureUrl('')
+      setVideoUrl('')
       setIsAnonymous(false)
       showToast('Complaint submitted successfully.', 'success')
       onSuccess?.()
@@ -216,6 +219,30 @@ function SubmitComplaint({ onSuccess }) {
             required
           />
         </div>
+        
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">Picture URL (Optional)</label>
+            <input
+              type="url"
+              value={pictureUrl}
+              onChange={(e) => setPictureUrl(e.target.value)}
+              className="admin-input"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">Video URL (Optional)</label>
+            <input
+              type="url"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              className="admin-input"
+              placeholder="https://example.com/video.mp4"
+            />
+          </div>
+        </div>
+
         <div className="flex items-start gap-3 rounded-xl border border-slate-700/60 bg-[#0c1424] px-4 py-3 transition-colors duration-200 hover:border-slate-600/80">
           <input
             type="checkbox"
@@ -227,29 +254,6 @@ function SubmitComplaint({ onSuccess }) {
           <label htmlFor="anonymous" className="text-sm leading-relaxed text-slate-300">
             Submit anonymously (Admin/Faculty will see <span className="font-semibold text-slate-100">Anonymous</span>).
           </label>
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">Attachments</label>
-          <div className="rounded-xl border-2 border-dashed border-slate-600/60 bg-[#0c1424] p-6 text-center transition-colors duration-200 hover:border-sky-500/30">
-            <span className="material-symbols-outlined text-4xl text-slate-500">cloud_upload</span>
-            <p className="mt-2 text-sm text-slate-500">Drag and drop or click to upload</p>
-            <input
-              type="file"
-              className="hidden"
-              id="complaint-files"
-              onChange={(e) => {
-                const first = e.target.files?.[0]
-                setFiles(first ? [first] : [])
-              }}
-            />
-            <label
-              htmlFor="complaint-files"
-              className="mt-2 inline-block cursor-pointer rounded-lg border border-sky-500/35 bg-sky-500/10 px-4 py-2 text-sm font-medium text-sky-300 transition-all duration-200 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-200"
-            >
-              Choose files
-            </label>
-            {files.length > 0 && <p className="mt-2 text-xs text-slate-500">1 file selected</p>}
-          </div>
         </div>
         {error && <p className="text-sm text-red-400">{error}</p>}
         <button

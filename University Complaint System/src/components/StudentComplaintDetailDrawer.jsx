@@ -364,43 +364,61 @@ export function StudentComplaintDetailDrawer({ open, onClose, summary }) {
                 {studentAttachments.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Student uploaded</p>
-                    {studentAttachments.map((a) => (
-                      <a
-                        key={a.id}
-                        href={attachmentUrls[a.id] || getFileUrl(a.file_path) || '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 rounded-xl border border-slate-700/60 bg-[#0c1424] p-3 transition-colors hover:border-sky-500/40 hover:bg-sky-500/[0.06]"
-                      >
-                        <span className="material-symbols-outlined text-sky-400">description</span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-slate-200">{a.file_name}</p>
-                          <p className="text-xs text-slate-500">{formatSize(a.file_size)}</p>
-                        </div>
-                        <span className="material-symbols-outlined text-slate-500">open_in_new</span>
-                      </a>
-                    ))}
+                    {studentAttachments.map((a) => {
+                      const isPic = a.file_name?.includes('Picture')
+                      const isVid = a.file_name?.includes('Video')
+                      const icon = isVid ? 'play_circle' : isPic ? 'image' : 'description'
+                      return (
+                        <a
+                          key={a.id}
+                          href={attachmentUrls[a.id] || getFileUrl(a.file_path) || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 rounded-xl border border-slate-700/60 bg-[#0c1424] p-3 transition-colors hover:border-sky-500/40 hover:bg-sky-500/[0.06]"
+                        >
+                          <span className={`material-symbols-outlined ${isPic || isVid ? 'text-sky-300' : 'text-slate-400'}`}>
+                            {icon}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-slate-200">{a.file_name}</p>
+                            <p className="text-xs text-slate-500">
+                              {isPic ? 'Image Link' : isVid ? 'Video Link' : formatSize(a.file_size)}
+                            </p>
+                          </div>
+                          <span className="material-symbols-outlined text-slate-500">open_in_new</span>
+                        </a>
+                      )
+                    })}
                   </div>
                 )}
                 {staffAttachments.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Staff updates</p>
-                    {staffAttachments.map((a) => (
-                      <a
-                        key={a.id}
-                        href={attachmentUrls[a.id] || getFileUrl(a.file_path) || '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 rounded-xl border border-slate-700/60 bg-[#0c1424] p-3 transition-colors hover:border-sky-500/40 hover:bg-sky-500/[0.06]"
-                      >
-                        <span className="material-symbols-outlined text-sky-400">description</span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-slate-200">{a.file_name}</p>
-                          <p className="text-xs text-slate-500">{formatSize(a.file_size)}</p>
-                        </div>
-                        <span className="material-symbols-outlined text-slate-500">open_in_new</span>
-                      </a>
-                    ))}
+                    {staffAttachments.map((a) => {
+                      const isPic = a.file_name?.includes('Picture')
+                      const isVid = a.file_name?.includes('Video')
+                      const icon = isVid ? 'play_circle' : isPic ? 'image' : 'description'
+                      return (
+                        <a
+                          key={a.id}
+                          href={attachmentUrls[a.id] || getFileUrl(a.file_path) || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 rounded-xl border border-slate-700/60 bg-[#0c1424] p-3 transition-colors hover:border-sky-500/40 hover:bg-sky-500/[0.06]"
+                        >
+                          <span className={`material-symbols-outlined ${isPic || isVid ? 'text-sky-300' : 'text-slate-400'}`}>
+                            {icon}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-slate-200">{a.file_name}</p>
+                            <p className="text-xs text-slate-500">
+                              {isPic ? 'Image Link' : isVid ? 'Video Link' : formatSize(a.file_size)}
+                            </p>
+                          </div>
+                          <span className="material-symbols-outlined text-slate-500">open_in_new</span>
+                        </a>
+                      )
+                    })}
                   </div>
                 )}
               </div>

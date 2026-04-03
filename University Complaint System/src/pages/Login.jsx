@@ -128,8 +128,22 @@ export function Login({ adminEntry = false }) {
       if (err) throw err
 
       if (supabase && signInData?.user) {
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', signInData.user.id).maybeSingle()
-        const roleFromProfile = profile?.role || signInData?.user?.user_metadata?.role
+        const { data: profileData } = await supabase.from('profiles').select('role').eq('id', signInData.user.id).maybeSingle()
+        const roleFromProfile = profileData?.role || signInData?.user?.user_metadata?.role
+        const intendedRole = adminEntry ? 'admin' : demoRole
+
+        // Role Validation: Allow admins to enter management portal, but keep student portal restricted
+        const isAuthorized = 
+          roleFromProfile === intendedRole || 
+          (intendedRole === 'staff' && roleFromProfile === 'admin')
+
+        if (!isAuthorized) {
+          await supabase.auth.signOut()
+          setLoading(false)
+          setError(`Unauthorized Access: Your account is registered as '${roleFromProfile}', but you are trying to access the '${intendedRole}' portal. Please use the correct portal.`)
+          return
+        }
+
         setLoading(false)
         if (roleFromProfile === 'admin') navigate('/admin')
         else if (roleFromProfile === 'staff') navigate('/staff')
@@ -340,7 +354,7 @@ export function Login({ adminEntry = false }) {
                   </div>
                 </motion.div>
                 <p className="mt-1.5 w-full text-center text-[9px] font-semibold uppercase tracking-[0.18em] text-sky-200/85 sm:text-[10px]">
-                  EduResolve
+                  CUIResolve
                 </p>
                 <h1 className="mt-1.5 w-full text-center leading-tight tracking-tight">
                   {!adminEntry ? (

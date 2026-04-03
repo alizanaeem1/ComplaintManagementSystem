@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
+import { DevelopmentTeamSection } from '../components/DevelopmentTeamSection'
 
 const STORAGE_KEY = 'selectedRole'
 
@@ -16,9 +17,9 @@ const ROLES = [
   },
   {
     id: 'staff',
-    title: 'Faculty',
-    description: 'Handle assigned complaints, deadlines, and department tasks.',
-    icon: 'groups',
+    title: 'Management Portal',
+    description: 'Monitor, manage, and resolve university complaints efficiently.',
+    icon: 'admin_panel_settings',
     accent: 'from-violet-400/30 to-fuchsia-500/20',
     ring: 'group-hover:shadow-violet-500/25'
   }
@@ -131,7 +132,7 @@ export function RoleSelect() {
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#070b14] text-slate-100">
+    <div className="relative min-h-screen w-full overflow-clip bg-[#070b14] text-slate-100">
       {/* Gradient mesh background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#0c4a6e]" />
       <motion.div
@@ -160,28 +161,34 @@ export function RoleSelect() {
         }}
       />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col justify-center px-4 py-16 md:px-8">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center gap-8 px-4 py-8 md:px-8">
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-10 text-center md:mb-14"
+          className="text-center"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">EduResolve</p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight text-white md:text-5xl md:leading-tight">
-            Choose your portal
+          <p className="text-xs font-bold uppercase tracking-[0.4em] text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]">Welcome to</p>
+          <h1 className="mt-2 text-5xl font-black tracking-tighter text-white md:text-7xl">
+            CUI<span className="bg-gradient-to-r from-sky-400 to-violet-500 bg-clip-text text-transparent">Resolve</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-sm text-white/65 md:text-base">
-            Select Student or Faculty to continue.
+          <p className="mx-auto mt-4 max-w-2xl text-[0.9rem] font-medium tracking-wide text-white/80 md:text-lg">
+            The Official University Complaint Management System
+          </p>
+          <div className="mx-auto mt-6 mb-6 h-px w-24 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          <p className="max-w-2xl mx-auto text-sm font-semibold text-white/50 leading-relaxed">
+            Pick your access point to manage complaints or oversee university operations.
           </p>
         </motion.div>
 
-        <div className="mx-auto grid max-w-3xl gap-5 md:grid-cols-2 md:gap-8">
+        <div className="mx-auto grid w-full max-w-3xl gap-5 md:grid-cols-2 lg:gap-8">
           {ROLES.map((role, i) => (
             <RoleCard key={role.id} role={role} index={i} onSelect={handleSelected} />
           ))}
         </div>
       </div>
+      
+      <DevelopmentTeamSection />
     </div>
   )
 }

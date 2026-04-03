@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ToastProvider } from './contexts/ToastContext'
 import { ReferenceDataProvider } from './contexts/ReferenceDataContext.jsx'
@@ -33,6 +33,7 @@ function ProtectedRoute({ children, allowedRoles }) {
   return children
 }
 
+/** /admin shows admin login when guest; dashboard when authenticated as admin. */
 function AdminGate() {
   const { user, profile, loading } = useAuth()
 
@@ -64,7 +65,6 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<RoleSelect />} />
       <Route path="/login" element={<Login />} />
-
       <Route
         path="/student/*"
         element={
@@ -73,9 +73,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route path="/admin/*" element={<AdminGate />} />
-
       <Route
         path="/staff/*"
         element={
@@ -84,7 +82,6 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
@@ -92,12 +89,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <ReferenceDataProvider>
-          <AppRoutes />
-        </ReferenceDataProvider>
-      </ToastProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ToastProvider>
+          <ReferenceDataProvider>
+            <AppRoutes />
+          </ReferenceDataProvider>
+        </ToastProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }

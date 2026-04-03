@@ -212,7 +212,7 @@ export function AdminReportsView({ complaints = [], loading = false, departments
   const exportCsv = useCallback(() => {
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
     const lines = [
-      ['EduResolve — Admin report', '', '', ''].map(esc).join(','),
+      ['CUIResolve — Admin report', '', '', ''].map(esc).join(','),
       ['Generated', new Date().toISOString(), '', ''].map(esc).join(','),
       ['Date range', `${rangeStart.toLocaleDateString()} – ${rangeEnd.toLocaleDateString()}`, '', ''].map(esc).join(','),
       ['Status filter', statusFilter || 'All', 'Department', departmentFilter || 'All'].map(esc).join(','),
@@ -251,7 +251,7 @@ export function AdminReportsView({ complaints = [], loading = false, departments
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `edu-resolve-report-${new Date().toISOString().slice(0, 10)}.csv`
+    a.download = `cui-resolve-report-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }, [filtered, rangeEnd, rangeStart, staffRows, statusFilter, departmentFilter, summary])
@@ -265,7 +265,7 @@ export function AdminReportsView({ complaints = [], loading = false, departments
           `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.department)}</td><td>${r.totalAssigned}</td><td>${r.resolved}</td><td>${r.late}</td><td>${r.performance != null ? `${r.performance}%` : '—'}</td></tr>`
       )
       .join('')
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>EduResolve Report</title>
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>CUIResolve Report</title>
       <style>
         body{font-family:system-ui,sans-serif;padding:24px;color:#111;max-width:900px;margin:0 auto;}
         h1{font-size:1.25rem;} table{border-collapse:collapse;width:100%;margin-top:16px;font-size:12px;}
@@ -273,7 +273,7 @@ export function AdminReportsView({ complaints = [], loading = false, departments
         .muted{color:#64748b;font-size:12px;} .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0;}
         .card{border:1px solid #e2e8f0;padding:12px;border-radius:8px;}
       </style></head><body>
-      <h1>EduResolve — Complaints report</h1>
+      <h1>CUIResolve — Complaints report</h1>
       <p class="muted">Generated ${escapeHtml(new Date().toLocaleString())}</p>
       <p class="muted">Range: ${escapeHtml(rangeStart.toLocaleDateString())} – ${escapeHtml(rangeEnd.toLocaleDateString())} · Status: ${escapeHtml(statusFilter || 'All')} · Department: ${escapeHtml(departmentFilter || 'All')}</p>
       <div class="grid">

@@ -70,7 +70,7 @@ export function StudentSidebar({ open, onClose }) {
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-2xl text-sky-400">school</span>
             <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-lg font-bold tracking-tight text-transparent">
-              EduResolve
+              CUIResolve
             </span>
           </div>
           <button
@@ -129,7 +129,7 @@ export function AdminSidebar({ open, onClose }) {
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-2xl text-sky-400">school</span>
             <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-lg font-bold tracking-tight text-transparent">
-              EduResolve
+              CUIResolve
             </span>
           </div>
           <button
@@ -198,7 +198,7 @@ export function StaffSidebar({ open, onClose }) {
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-2xl text-sky-400">school</span>
             <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-lg font-bold tracking-tight text-transparent">
-              EduResolve
+              CUIResolve
             </span>
           </div>
           <button

@@ -485,139 +485,64 @@ export async function upsertComplaintRating({ complaintId, studentId, rating }) 
 }
 
 /**
- * Create complaint and optionally upload files
+ * Create complaint and optionally add picture/video URLs
  */
-export async function createComplaint({ userId, title, category, description, priority = 'medium', files = [], isAnonymous = false }) {
+export async function createComplaint({ userId, title, category, description, priority = 'medium', pictureUrl = '', videoUrl = '', isAnonymous = false }) {
   if (!supabase) return { data: null, error: { message: 'Demo mode: add Supabase to .env to view details. See README.' } }
   const insertWithAnon = { user_id: userId, is_anonymous: !!isAnonymous, status: 'submitted', title, category, description, priority }
   const insertWithoutAnon = { user_id: userId, status: 'submitted', title, category, description, priority }
 
   const { data: complaint, error: e1 } = await supabase.from('complaints').insert(insertWithAnon).select().single()
-  if (e1) {
-    // If DB migration hasn't been run yet, `is_anonymous` column might not exist.
-    if (/is_anonymous/i.test(e1.message || '')) {
-      const retry = await supabase.from('complaints').insert(insertWithoutAnon).select().single()
-      if (retry.error) return { data: null, error: { message: `Complaints insert failed: ${retry.error.message || 'unknown error'}` } }
-      // Anonymous flag won't be stored, but complaint will be created.
-      if (retry.data?.status === 'submitted') {
-        try {
-          await supabase.from('complaint_status_history').insert({
-            complaint_id: retry.data.id,
-            changed_by: userId,
-            from_status: null,
-            to_status: 'submitted',
-            assigned_department: null
-          })
-        } catch (_) {
-          // non-critical for UI; ignore
-        }
-      }
-      if (files.length) {
-        try {
-          const paths = await uploadComplaintFiles(retry.data.id, null, files)
-          if (paths.length) {
-            const { error: attErr } = await supabase.from('complaint_attachments').insert(
-              paths.map(({ path, name, size }) => ({
-                complaint_id: retry.data.id,
-                file_path: path,
-                file_name: name,
-                file_size: size
-              }))
-            )
-            if (attErr) return { data: null, error: { message: `Attachment metadata insert failed: ${attErr.message || 'unknown error'}` } }
-          }
-        } catch (uploadErr) {
-          return { data: null, error: { message: `Storage upload failed: ${uploadErr?.message || 'unknown error'}` } }
-        }
-      }
-      return { data: retry.data, error: null }
-    }
-    // If DB migration hasn't been run yet, `submitted` status might not be allowed.
-    if (/submitted/i.test(e1.message || '') || /status/i.test(e1.message || '')) {
-      const fallbackWithPendingAnon = { user_id: userId, is_anonymous: !!isAnonymous, status: 'pending', title, category, description, priority }
-      const fallbackWithoutAnon = { user_id: userId, status: 'pending', title, category, description, priority }
-      const { data: complaint2, error: e2 } = await supabase.from('complaints').insert(fallbackWithPendingAnon).select().single()
-      if (!e2) {
-        if (files.length) {
-          try {
-            const paths = await uploadComplaintFiles(complaint2.id, null, files)
-            if (paths.length) {
-              const { error: attErr } = await supabase.from('complaint_attachments').insert(
-                paths.map(({ path, name, size }) => ({
-                  complaint_id: complaint2.id,
-                  file_path: path,
-                  file_name: name,
-                  file_size: size
-                }))
-              )
-              if (attErr) return { data: null, error: { message: `Attachment metadata insert failed: ${attErr.message || 'unknown error'}` } }
-            }
-          } catch (uploadErr) {
-            return { data: null, error: { message: `Storage upload failed: ${uploadErr?.message || 'unknown error'}` } }
-          }
-        }
-        return { data: complaint2, error: null }
-      }
+  
+  let finalComplaint = complaint
+  let finalError = e1
 
-      const retry = await supabase.from('complaints').insert(fallbackWithoutAnon).select().single()
-      if (retry.error) return { data: null, error: { message: `Complaints fallback insert failed: ${retry.error.message || 'unknown error'}` } }
-      if (files.length && retry.data?.id) {
-        try {
-          const paths = await uploadComplaintFiles(retry.data.id, null, files)
-          if (paths.length) {
-            const { error: attErr } = await supabase.from('complaint_attachments').insert(
-              paths.map(({ path, name, size }) => ({
-                complaint_id: retry.data.id,
-                file_path: path,
-                file_name: name,
-                file_size: size
-              }))
-            )
-            if (attErr) return { data: null, error: { message: `Attachment metadata insert failed: ${attErr.message || 'unknown error'}` } }
-          }
-        } catch (uploadErr) {
-          return { data: null, error: { message: `Storage upload failed: ${uploadErr?.message || 'unknown error'}` } }
-        }
-      }
-      return { data: retry.data, error: null }
-    }
-    return { data: null, error: { message: `Complaints insert failed: ${e1.message || 'unknown error'}` } }
+  if (e1 && /is_anonymous/i.test(e1.message || '')) {
+    const retry = await supabase.from('complaints').insert(insertWithoutAnon).select().single()
+    finalComplaint = retry.data
+    finalError = retry.error
   }
 
-  // Initial lifecycle event: student submitted complaint.
-  if (complaint?.status === 'submitted') {
+  if (finalError) return { data: null, error: { message: `Complaints insert failed: ${finalError.message || 'unknown error'}` } }
+
+  // Initial lifecycle event
+  if (finalComplaint?.status === 'submitted') {
     try {
       await supabase.from('complaint_status_history').insert({
-        complaint_id: complaint.id,
+        complaint_id: finalComplaint.id,
         changed_by: userId,
         from_status: null,
         to_status: 'submitted',
         assigned_department: null
       })
-    } catch (_) {
-      // non-critical for UI; ignore
-    }
+    } catch (_) {}
   }
 
-  if (files.length) {
-    try {
-      const paths = await uploadComplaintFiles(complaint.id, null, files)
-      if (paths.length) {
-        const { error: attErr } = await supabase.from('complaint_attachments').insert(
-          paths.map(({ path, name, size }) => ({
-            complaint_id: complaint.id,
-            file_path: path,
-            file_name: name,
-            file_size: size
-          }))
-        )
-        if (attErr) return { data: null, error: { message: `Attachment metadata insert failed: ${attErr.message || 'unknown error'}` } }
-      }
-    } catch (uploadErr) {
-      return { data: null, error: { message: `Storage upload failed: ${uploadErr?.message || 'unknown error'}` } }
-    }
+  // Add URL attachments if provided
+  const attachments = []
+  if (pictureUrl && pictureUrl.trim()) {
+    attachments.push({
+      complaint_id: finalComplaint.id,
+      file_path: pictureUrl.trim(),
+      file_name: 'Picture Attachment',
+      file_size: 0
+    })
   }
-  return { data: complaint, error: null }
+  if (videoUrl && videoUrl.trim()) {
+    attachments.push({
+      complaint_id: finalComplaint.id,
+      file_path: videoUrl.trim(),
+      file_name: 'Video Attachment',
+      file_size: 0
+    })
+  }
+
+  if (attachments.length > 0) {
+    const { error: attErr } = await supabase.from('complaint_attachments').insert(attachments)
+    if (attErr) return { data: null, error: { message: `Attachment metadata insert failed: ${attErr.message || 'unknown error'}` } }
+  }
+
+  return { data: finalComplaint, error: null }
 }
 
 /**
@@ -849,7 +774,8 @@ export async function uploadComplaintFiles(complaintId, responseId, files) {
  * Get public URL for a stored file (if bucket is public). For private bucket use createSignedUrl.
  */
 export function getFileUrl(path) {
-  if (!supabase) return null
+  if (!supabase || !path) return null
+  if (path.startsWith('http')) return path
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
   return data?.publicUrl || null
 }
@@ -860,6 +786,8 @@ export function getFileUrl(path) {
  */
 export async function getFileAccessUrl(path, expiresInSeconds = 3600) {
   if (!supabase || !path) return null
+  // Support external URLs
+  if (path.startsWith('http')) return path
   try {
     const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, expiresInSeconds)
     if (!error && data?.signedUrl) return data.signedUrl
